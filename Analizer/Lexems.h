@@ -86,7 +86,12 @@ enum class LexType {
 	CALL_PARAM_TAIL = 141,
 	VALUE_TAIL = 142,
 	IDENT_OPERATION_TAIL = 143,
-	VAR_DEC_TAIL = 144
+	VAR_DEC_TAIL = 144,
+	PARAMS_LIST = 145,
+	CALL_PARAM_LIST = 146
 };
+
+const char* get_lex_type_name(LexType lexem);
+const char* get_construction_name(LexType lexem);
 
 int is_terminal(LexType lexem);

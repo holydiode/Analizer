@@ -4,18 +4,18 @@
 #include "Lexems.h"
 
 class Analizer {
-private:
-	Clip clip;
-	Scanner scan;
-	int error_code;
-
-	bool some_int_list() {
-
-	}
-
 public:
 	Analizer();
 	int run(const char* file);
+	int error_code;
+	Cursore position();
+	char* last_readed_lexem();
+	LexType last_waited_lexem();
+private:
+	Clip clip;
+	Scanner scan;
+	LexType last_waited;
+
 	int terminal_process(LexType);
 	int non_terminal_process(LexType);
 
@@ -83,12 +83,14 @@ public:
 
 
 	void params_rule();
+	void params_list_rule();
 	void params_tail_rule();
 
 
 	void value_rule();
 	void value_tail_rule();
 	void call_param_rule();
+	void call_param_list_rule();
 	void call_param_tail_rule();
 	void ident_operation_tail_rule1();
 	void ident_operation_tail_rule2();

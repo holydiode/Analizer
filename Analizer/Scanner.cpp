@@ -56,24 +56,52 @@ LexType Scanner::word_lexem()
     }
     lex[i] = '\0';
     for (int j = 0; j < 5; j++)
-        if (strcmp(lex, keyword[j]) == 0)
+        if (strcmp(lex, keyword[j]) == 0) {
+            cur_position.column += i;
+            last_lexem = lex;
             return indexKeyword[j];
-    return LexType::NAME;    
+        }
+    cur_position.column += i;
+    last_lexem = lex;
+    return LexType::NAME;
 }
 
 LexType Scanner::number_lexem()
 {
-    while (IS_DIGIT(*cur_char))
+    char* lex = (char*)malloc(50);
+    int i = 0;
+    while (IS_DIGIT(*cur_char)) {
+        lex[i++] = *cur_char;
         cur_char++;
+    }
+    cur_position.column += i;
+    last_lexem = lex;
     return LexType::CONSTANT;
 }
+
+
 
 LexType Scanner::scan()
 {
     Cursore line_skiped = skip_ignore();
+    cur_position.row += line_skiped.row;
+    if (line_skiped.row) {
+        cur_position.column = line_skiped.column;
+    }
+    else {
+        cur_position.column += line_skiped.column;
+    }
+
     while (line_skiped.row || line_skiped.column )
     {
         line_skiped = skip_ignore();
+
+        if (line_skiped.row) {
+            cur_position.column = line_skiped.column;
+        }
+        else {
+            cur_position.column += line_skiped.column;
+        }
     }
 
     if (IS_LETTER(*cur_char) || *cur_char == '_')
@@ -90,8 +118,12 @@ LexType Scanner::scan()
         cur_char++;
         if(*cur_char == '|') {
             cur_char++;
+            last_lexem = (char*)"||";
+            cur_position.column += 2;
             return LexType::OR_SIGN;
         }
+        last_lexem = (char*)"|";
+        cur_position.column += 1;
         return LexType::DISUNC_SIGN;
     }
 
@@ -99,8 +131,12 @@ LexType Scanner::scan()
         cur_char++;
         if (*cur_char == '&') {
             cur_char++;
+            last_lexem = (char*)"&&";
+            cur_position.column += 2;
             return LexType::AND_SIGN;
         }
+        last_lexem = (char*)"|";
+        cur_position.column += 1;
         return LexType::CONUC_SIGN;
     }
 
@@ -108,8 +144,12 @@ LexType Scanner::scan()
         cur_char++;
         if (*cur_char == '=') {
             cur_char++;
+            last_lexem = (char*)"==";
+            cur_position.column += 2;
             return LexType::EQUAL_SIGN;
         }
+        last_lexem = (char*)"=";
+        cur_position.column += 1;
         return LexType::ASSIGN_SIGN;
     }
 
@@ -117,8 +157,12 @@ LexType Scanner::scan()
         cur_char++;
         if (*cur_char == '=') {
             cur_char++;
+            last_lexem = (char*)"<=";
+            cur_position.column += 2;
             return LexType::LESS_OR_EQUAL_SIGN;
         }
+        last_lexem = (char*)"<";
+        cur_position.column += 1;
         return LexType::LESS_SIGN;
     }
 
@@ -126,72 +170,102 @@ LexType Scanner::scan()
         cur_char++;
         if (*cur_char == '=') {
             cur_char++;
+            last_lexem = (char*)">=";
+            cur_position.column += 2;
             return LexType::MORE_OR_EQUAL_SIGN;
         }
+        last_lexem = (char*)"||";
+        cur_position.column += 1;
         return LexType::MORE_SIGN;
     }
 
     if (*cur_char == '!' && *(cur_char + 1) == '=') {
         cur_char += 2;
+        last_lexem = (char*)"!=";
+        cur_position.column += 2;
         return LexType::NOT_EQUAL_SING;
     }
 
     if (*cur_char == '+') {
+        last_lexem = (char*)"+";
+        cur_position.column += 1;
         cur_char++;
         return LexType::PLUS_SIGN;
     }
 
     if (*cur_char == '-') {
+        last_lexem = (char*)"-";
+        cur_position.column += 1;
         cur_char++;
         return LexType::MINUS_SIGN;
     }
 
     if (*cur_char == '*') {
+        last_lexem = (char*)"*";
+        cur_position.column += 1;
         cur_char++;
         return LexType::MULTIPLE_SING;
     }
     
     if (*cur_char == '/') {
+        last_lexem = (char*)"/";
+        cur_position.column += 1;
         cur_char++;
         return LexType::DIV_SIGN;
     }
     
     if(*cur_char == '%') {
+        last_lexem = (char*)"%";
+        cur_position.column += 1;
         cur_char++;
         return LexType::MOD_SIGN;
     }    
 
     if(*cur_char == ';') {
+        last_lexem = (char*)";";
+        cur_position.column += 1;
         cur_char++;
         return LexType::SEMY;
     }
 
     if(*cur_char == '(') {
+        last_lexem = (char*)"(";
+        cur_position.column += 1;
         cur_char++;
         return LexType::LEFT_PRNT;
     }
 
     if(*cur_char == ')') {
+        last_lexem = (char*)")";
+        cur_position.column += 1;
         cur_char++;
         return LexType::RIGHT_PRNT;
     }
 
     if(*cur_char == '{') {
+        last_lexem = (char*)"{";
+        cur_position.column += 1;
         cur_char++;
         return LexType::LEFT_BRK;
     }
 
     if(*cur_char == '}') {
+        last_lexem = (char*)"}";
+        cur_position.column += 1;
         cur_char++;
         return LexType::RIGHT_BRK;
     }
 
     if (*cur_char == '.') {
+        last_lexem = (char*)".";
+        cur_position.column += 1;
         cur_char++;
         return LexType::DOT;
     }
 
     if (*cur_char == ',') {
+        last_lexem = (char*)",";
+        cur_position.column += 1;
         cur_char++;
         return LexType::COL;
     }
@@ -202,9 +276,21 @@ LexType Scanner::scan()
 LexType Scanner::watch()
 {
     char* save_pointer = cur_char;
+    Cursore save_cursore = cur_position;
     LexType type = scan();
     cur_char = save_pointer;
+    cur_position = save_cursore;
     return type;
+}
+
+Cursore Scanner::position()
+{
+    return cur_position;
+}
+
+char* Scanner::elxem()
+{
+    return last_lexem;
 }
 
 void Scanner::read(const char* filename)
@@ -217,4 +303,7 @@ void Scanner::read(const char* filename)
     std::copy(buffer.begin(), buffer.end(), text);
 
     cur_char = text;
+    cur_position.column = 0;
+    cur_position.row = 0;
+    last_lexem = (char*)"None";
 }

@@ -2,19 +2,23 @@
 #include "Clip.h"
 #include "Scanner.h"
 #include "Lexems.h"
+#include "Translate.h"
+#include "Errors.h"
 
 class Analizer {
 public:
 	Analizer();
 	int run(const char* file);
-	int error_code;
+	Errors  error_code;
 	Cursore position();
 	char* last_readed_lexem();
 	LexType last_waited_lexem();
+	void draw_semantic_tree();
 private:
 	Clip clip;
 	Scanner scan;
 	LexType last_waited;
+	Translate transaltor;
 
 	int terminal_process(LexType);
 	int non_terminal_process(LexType);
@@ -88,7 +92,8 @@ private:
 
 
 	void value_rule();
-	void value_tail_rule();
+	void value_tail_rule1();
+	void value_tail_rule2();
 	void call_param_rule();
 	void call_param_list_rule();
 	void call_param_tail_rule();
@@ -96,7 +101,6 @@ private:
 	void ident_operation_tail_rule2();
 	void ident_operation_tail_rule3();
 	void var_dec_tail_rule();
-
 
 	void set_rulle(LexType lexem);
 };

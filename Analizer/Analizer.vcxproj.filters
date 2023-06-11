@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Исходные файлы\Semantic">
+      <UniqueIdentifier>{eb7f7616-a7eb-48ec-8841-e5306b8baf72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\Semantic">
+      <UniqueIdentifier>{66f27428-3b67-49a2-90c7-d3ff9e5dab78}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Analizer.cpp">
@@ -27,6 +33,12 @@
     <ClCompile Include="Lexems.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Semantic.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Translate.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Clip.h">
@@ -39,6 +51,15 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="Scanner.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Semantic.h">
+      <Filter>Файлы заголовков\Semantic</Filter>
+    </ClInclude>
+    <ClInclude Include="Translate.h">
+      <Filter>Файлы заголовков\Semantic</Filter>
+    </ClInclude>
+    <ClInclude Include="Errors.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

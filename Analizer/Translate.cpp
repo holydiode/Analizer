@@ -125,11 +125,6 @@ void Translate::chek_name()
 	}
 }
 
-void Translate::init()
-{
-	this->factory.init();
-}
-
 void Translate::add_param()
 {
 	SemanticNode* node = new SemanticNode();
@@ -145,7 +140,6 @@ void Translate::add_param()
 	}
 	node->source_objetc = this->context_object;
 	node->insert(node->source_objetc->inside()->deep_object_copy());
-	node->is_init = true;
 	this->factory.add_param(node);
 	this->generator.send_init_param(this->analizer->last_readed_lexem());
 	context_object = nullptr;
@@ -281,6 +275,3 @@ void Translate::generate_operation()
 		analizer->error_code = Errors::NO_DATA_TYPE_MATCH;
 	}
 }
-
-
-

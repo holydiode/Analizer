@@ -16,7 +16,6 @@ public:
 	SemanticNode* source_objetc;
 
 	char* name;
-	bool is_init;
 	int count_param;
 	int func_start;
 
@@ -71,7 +70,6 @@ public:
 	void set_type(ObjectType type);
 	void add_param(SemanticNode* node);
 	void set_class_object(SemanticNode* node);
-	void init();
 private:
 	SemanticNode* node;
 };

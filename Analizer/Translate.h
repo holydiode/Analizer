@@ -19,7 +19,6 @@ public:
 	void complite_dec_fun();
 	void draw_semantic_tree();
 	void chek_name();
-	void init();
 	void add_param();
 	void free_context();
 	void check_is_variable();

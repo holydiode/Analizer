@@ -354,9 +354,6 @@ int Analizer::non_terminal_process(LexType clip_lex)
 	case(LexType::VAR_DECLARE_DELTA):
 		transaltor.complite_dec_var();
 		break;
-	case(LexType::INIT_DELTA):
-		transaltor.init();
-		break;
 	case(LexType::CHECK_NAME_DELTA):
 		transaltor.chek_name();
 		break;
@@ -552,11 +549,10 @@ void Analizer::for_rule()
 
 void Analizer::for_init_rule()
 {
-	clip.set_array(8,
+	clip.set_array(7,
 		LexType::DATA_TYPE,
 		LexType::NAME_DECLARE_DELTA,  //delta         //boopa
 		LexType::NAME,
-		LexType::INIT_DELTA,          //delta
 		LexType::VAR_DECLARE_DELTA,   //delta
 		LexType::ASSIGN_SIGN,
 		LexType::EXPR,
@@ -882,8 +878,7 @@ void Analizer::ident_operation_tail_rule3()
 
 void Analizer::var_dec_tail_rule()
 {
-	clip.set_array(4,
-		LexType::INIT_DELTA, //delta
+	clip.set_array(3,
 		LexType::ASSIGN_SIGN,
 		LexType::EXPR,
 		LexType::ASSIGN_OPERATION_DELTA //operation

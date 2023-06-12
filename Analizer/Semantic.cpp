@@ -6,7 +6,6 @@ SemanticNode::SemanticNode()
 	name = nullptr;
 	count_param = 0;
 	func_start = 0;
-	is_init = false;
 	left = nullptr;
 	right = nullptr;
 	up = nullptr;
@@ -124,7 +123,6 @@ SemanticNode* SemanticNode::deep_object_copy()
 	copy->type = type;
 	copy->func_start = func_start;
 	copy->source_objetc = source_objetc;
-	copy->is_init = is_init;
 	copy->name = name;
 	if (left) {
 		copy->left = left->deep_object_copy();
@@ -271,8 +269,4 @@ void NodeFactory::add_param(SemanticNode* node)
 void NodeFactory::set_class_object(SemanticNode* node)
 {
 	this->node->source_objetc = node;
-}
-
-void NodeFactory::init()
-{
 }

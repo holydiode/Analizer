@@ -1,5 +1,6 @@
 #pragma once
 #include "Semantic.h"
+#include "TriadGenerator.h"
 #include <stack>
 
 class Analizer;
@@ -25,11 +26,23 @@ public:
 	void init_call();
 	void add_call_param();
 	void set_call();
+	void push_const();
+	void push_var();
+	void generate_assing();
+	void write_triads();
+	void generate_operation();
+	void push_oper();
+	void add_mark();
+	void loop();
+	void return_operation();
+	void prepare_for_assign_operation();
 private:
 	bool name_is_exeist();
 	SemanticTree tree;
 	Analizer* analizer;
 	NodeFactory factory;
+	TriadGenerator generator;
 	SemanticNode* context_object;
 	std::stack<int> stak_call_param_count;
+	std::stack<int> marks;
 };

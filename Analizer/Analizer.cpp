@@ -6,7 +6,6 @@ Analizer::Analizer()
 	this->transaltor = Translate(this);
 	this->error_code = Errors::NO_ERROR;
 	this->scan = Scanner();
-
 }
 
 int Analizer::run(const char* file)
@@ -52,6 +51,11 @@ void Analizer::draw_semantic_tree()
 	transaltor.draw_semantic_tree();
 }
 
+void Analizer::write_triads()
+{
+	this->transaltor.write_triads();
+}
+
 int Analizer::terminal_process(LexType clip_lex)
 {
 	LexType scan_lex = scan.scan();
@@ -87,9 +91,6 @@ int Analizer::non_terminal_process(LexType clip_lex)
 		{
 		case(LexType::SEMY):
 			decloaration_tail_rule1();
-			break;
-		case(LexType::ASSIGN_SIGN):
-			decloaration_tail_rule2();
 			break;
 		case(LexType::LEFT_PRNT):
 			decloaration_tail_rule3();
@@ -139,9 +140,6 @@ int Analizer::non_terminal_process(LexType clip_lex)
 		case(LexType::FOR_KEYWORD):
 			simple_operator_rule1();
 			break;
-		case(LexType::RETURN_KEYWORD):
-			simple_operator_rule2();
-			break;
 		case(LexType::NAME):
 			simple_operator_rule3();
 			break;
@@ -165,6 +163,11 @@ int Analizer::non_terminal_process(LexType clip_lex)
 	case(LexType::FOR_EXPR):
 		if (next_lex == LexType::NAME || next_lex == LexType::CONSTANT || next_lex == LexType::LEFT_BRK) {
 			for_expr_rule();
+		}
+		break;
+	case(LexType::FOR_STEP):
+		if (next_lex == LexType::NAME) {
+			for_step_rule();
 		}
 		break;
 	case(LexType::EXPR):
@@ -226,7 +229,7 @@ int Analizer::non_terminal_process(LexType clip_lex)
 		if (next_lex == LexType::MULTIPLE_SING ||
 			next_lex == LexType::MOD_SIGN ||
 			next_lex == LexType::DIV_SIGN)
-			compare_rithg_rule();
+			multipl_rithg_rule();
 		break;
 	case(LexType::IDENT):
 		ident_rule();
@@ -366,7 +369,7 @@ int Analizer::non_terminal_process(LexType clip_lex)
 	case(LexType::CHECK_VARIABLE_DELTA):
 		transaltor.check_is_variable();
 		break;
-	case(LexType::ADD_PARAM_DELTA):               
+	case(LexType::ADD_PARAM_DELTA):
 		transaltor.add_param();
 		break;
 	case(LexType::INIT_CALL_DELTA):
@@ -377,6 +380,30 @@ int Analizer::non_terminal_process(LexType clip_lex)
 		break;
 	case(LexType::COMPLITE_COLL_DELTA):
 		transaltor.set_call();
+		break;
+	case(LexType::ASSIGN_OPERATION_DELTA):
+		transaltor.generate_assing();
+		break;
+	case(LexType::CONST_OPERATION_DELTA):
+		transaltor.push_const();
+		break;
+	case(LexType::OPERATION_DELTA):
+		transaltor.generate_operation();
+		break;
+	case(LexType::TYPE_OPERATION_DELTA):
+		transaltor.push_oper();
+		break;
+	case(LexType::MARK_OPERATION_DELTA):
+		transaltor.add_mark();
+		break;
+	case(LexType::LOOP_OPERATION_DELTA):
+		transaltor.loop();
+		break;
+	case(LexType::RETURN_OPERATION_DELTA):
+		transaltor.return_operation();
+		break;
+	case(LexType::ASSIGN_INIT_OPERATION_DELTA):
+		transaltor.prepare_for_assign_operation();
 		break;
 	default:
 		error_code = Errors::NO_RECOGNIZE_LEXEM;
@@ -427,26 +454,21 @@ void Analizer::decloaration_tail_rule1()
 		);
 }
 
-void Analizer::decloaration_tail_rule2()
-{
-	clip.set_array(5,
-		LexType::INIT_DELTA, //delta
-		LexType::ASSIGN_SIGN,
-		LexType::EXPR,
-		LexType::SEMY,
-		LexType::VAR_DECLARE_DELTA //delta
-	);
-}
+
 
 void Analizer::decloaration_tail_rule3()
 {
-	clip.set_array(8,
-		LexType::LEFT_PRNT,    //добавить проверку на функцию
+	clip.set_array(12,
+		LexType::LEFT_PRNT,
 		LexType::PARAM,
 		LexType::RIGHT_PRNT,
 		LexType::LEFT_BRK,
 		LexType::FUN_DECLARE_DELTA,
 		LexType::COMAND_LIST,
+		LexType::RETURN_KEYWORD,
+		LexType::EXPR,
+		LexType::RETURN_OPERATION_DELTA,
+		LexType::SEMY,
 		LexType::RIGHT_BRK,
 		LexType::UPSIDE_DELTA
 	);
@@ -486,15 +508,6 @@ void Analizer::simple_operator_rule1()
 	clip.set(LexType::FOR);
 }
 
-void Analizer::simple_operator_rule2()
-{
-	clip.set_array(3,
-		LexType::RETURN_KEYWORD,
-		LexType::EXPR,
-		LexType::SEMY       //возможно потребуется делта на взначениев возвращенной функции
-	);
-}
-
 void Analizer::simple_operator_rule3()
 {
 	clip.set_array(3,
@@ -508,47 +521,64 @@ void Analizer::simple_operator_rule4()
 {
 	clip.set_array(6,
 		LexType::DATA_TYPE,
-		LexType::NAME_DECLARE_DELTA, //delta
+		LexType::ASSIGN_INIT_OPERATION_DELTA,
+		LexType::NAME_DECLARE_DELTA,
 		LexType::NAME,
 		LexType::VAR_DEC_TAIL,
 		LexType::SEMY,
-		LexType::VAR_DECLARE_DELTA //delta
+		LexType::VAR_DECLARE_DELTA
 	);
 }
 
 void Analizer::for_rule()
 {
-	clip.set_array(11,
+	clip.set_array(14,
 		LexType::FOR_KEYWORD,
 		LexType::INSIDE_DELTA, //delta
 		LexType::LEFT_PRNT,
 		LexType::FOR_INIT,
 		LexType::SEMY,
+		LexType::MARK_OPERATION_DELTA,
 		LexType::FOR_EXPR,
 		LexType::SEMY,
-		LexType::FOR_EXPR,
+		LexType::FOR_STEP,
 		LexType::RIGHT_PRNT,
 		LexType::OPERATOR,
+		LexType::MARK_OPERATION_DELTA,
+		LexType::LOOP_OPERATION_DELTA,
 		LexType::UPSIDE_DELTA //delta
 	);
 }
 
 void Analizer::for_init_rule()
 {
-	clip.set_array(7,
+	clip.set_array(8,
 		LexType::DATA_TYPE,
-		LexType::NAME_DECLARE_DELTA,  //delta         
+		LexType::NAME_DECLARE_DELTA,  //delta         //boopa
 		LexType::NAME,
 		LexType::INIT_DELTA,          //delta
 		LexType::VAR_DECLARE_DELTA,   //delta
 		LexType::ASSIGN_SIGN,
-		LexType::EXPR
+		LexType::EXPR,
+		LexType::ASSIGN_OPERATION_DELTA
 	);
 }
 
 void Analizer::for_expr_rule()
 {
 	clip.set(LexType::EXPR);
+}
+
+void Analizer::for_step_rule()
+{
+	clip.set_array(6,
+		LexType::IDENT,
+		LexType::CHECK_VARIABLE_DELTA,
+		LexType::FREE_CONTEXT_DELTA,
+		LexType::ASSIGN_SIGN,
+		LexType::EXPR,
+		LexType::ASSIGN_OPERATION_DELTA
+	);
 }
 
 void Analizer::expr_rule()
@@ -561,10 +591,11 @@ void Analizer::expr_rule()
 
 void Analizer::expr_right_rule()
 {
-	clip.set_array(3,
+	clip.set_array(4,
 		LexType::OR_SIGN,
 		LexType::EXPR,
-		LexType::EXPR_RIGHT
+		LexType::EXPR_RIGHT,
+		LexType::OPERATION_DELTA
 	);
 }
 
@@ -578,10 +609,11 @@ void Analizer::and_left_rule()
 
 void Analizer::and_rithg_rule()
 {
-	clip.set_array(3,
+	clip.set_array(4,
 		LexType::AND_SIGN,
 		LexType::AND_LEFT,
-		LexType::AND_RIGHT
+		LexType::AND_RIGHT,
+		LexType::OPERATION_DELTA
 	);
 }
 
@@ -595,10 +627,11 @@ void Analizer::disunc_left_rule()
 
 void Analizer::disunc_rithg_rule()
 {
-	clip.set_array(3,
+	clip.set_array(4,
 		LexType::DISUNC_SIGN,
 		LexType::DISUNC_LEFT,
-		LexType::DISUNC_RIGHT
+		LexType::DISUNC_RIGHT,
+		LexType::OPERATION_DELTA
 	);
 }
 
@@ -612,10 +645,11 @@ void Analizer::conuc_left_rule()
 
 void Analizer::conuc_rithg_rule()
 {
-	clip.set_array(3,
+	clip.set_array(4,
 		LexType::CONUC_SIGN,
 		LexType::CONUC_LEFT,
-		LexType::CONUC_RIGHT
+		LexType::CONUC_RIGHT,
+		LexType::OPERATION_DELTA
 	);
 }
 
@@ -629,10 +663,11 @@ void Analizer::equals_left_rule()
 
 void Analizer::equals_rithg_rule()
 {
-	clip.set_array(3,
+	clip.set_array(4,
 		LexType::EQUALS_SIGNS,
 		LexType::EQUALS_lEFT,
-		LexType::EQUALS_RIGHT
+		LexType::EQUALS_RIGHT,
+		LexType::OPERATION_DELTA
 	);
 }
 
@@ -646,10 +681,11 @@ void Analizer::compare_left_rule()
 
 void Analizer::compare_rithg_rule()
 {
-	clip.set_array(3,
+	clip.set_array(4,
 		LexType::COMPARE_SIGNS,
 		LexType::COMPARE_LEFT,
-		LexType::COMPARE_RIGHT
+		LexType::COMPARE_RIGHT,
+		LexType::OPERATION_DELTA
 	);
 }
 
@@ -663,10 +699,11 @@ void Analizer::adition_left_rule()
 
 void Analizer::adition_rithg_rule()
 {
-	clip.set_array(3,
+	clip.set_array(4,
 		LexType::ADDITION_SIGNS,
 		LexType::ADDITION_LEFT,
-		LexType::ADDITION_RIGHT
+		LexType::ADDITION_RIGHT,
+		LexType::OPERATION_DELTA
 	);
 }
 
@@ -674,16 +711,17 @@ void Analizer::multipl_left_rule()
 {
 	clip.set_array(2,
 		LexType::BASIC_EXP,
-		LexType::CONUC_RIGHT
+		LexType::MULTIPLE_RIGHT
 	);
 }
 
 void Analizer::multipl_rithg_rule()
 {
-	clip.set_array(3,
+	clip.set_array(4,
 		LexType::MULTIPLE_SIGNS,
 		LexType::MULTIPLE_LEFT,
-		LexType::MULTIPLE_RIGHT
+		LexType::MULTIPLE_RIGHT,
+		LexType::OPERATION_DELTA
 	);
 }
 
@@ -694,7 +732,9 @@ void Analizer::basic_expr_rule1()
 
 void Analizer::basic_expr_rule2()
 {
-	clip.set(LexType::CONSTANT);
+	clip.set_array(2,
+		LexType::CONST_OPERATION_DELTA,
+		LexType::CONSTANT);
 }
 
 void Analizer::basic_expr_rule3()
@@ -785,7 +825,6 @@ void Analizer::value_tail_rule2()
 	);
 }
 
-
 void Analizer::call_param_rule()
 {
 	clip.set(LexType::CALL_PARAM_LIST);
@@ -810,11 +849,12 @@ void Analizer::call_param_tail_rule()
 
 void Analizer::ident_operation_tail_rule1()
 {
-	clip.set_array(4,
-		LexType::CHECK_VARIABLE_DELTA, // delta
-		LexType::FREE_CONTEXT_DELTA, //delta
+	clip.set_array(5,
+		LexType::CHECK_VARIABLE_DELTA,   
+		LexType::FREE_CONTEXT_DELTA, 
 		LexType::ASSIGN_SIGN,
-		LexType::EXPR
+		LexType::EXPR,
+		LexType::ASSIGN_OPERATION_DELTA
 	);
 }
 
@@ -831,7 +871,8 @@ void Analizer::ident_operation_tail_rule2()
 
 void Analizer::ident_operation_tail_rule3()
 {
-	clip.set_array(4,
+	clip.set_array(5,
+		LexType::ASSIGN_INIT_OPERATION_DELTA,
 		LexType::NAME_DECLARE_DELTA,  //delta 
 		LexType::NAME,
 		LexType::VAR_DEC_TAIL,
@@ -841,70 +882,30 @@ void Analizer::ident_operation_tail_rule3()
 
 void Analizer::var_dec_tail_rule()
 {
-	clip.set_array(3,
+	clip.set_array(4,
 		LexType::INIT_DELTA, //delta
 		LexType::ASSIGN_SIGN,
-		LexType::EXPR
+		LexType::EXPR,
+		LexType::ASSIGN_OPERATION_DELTA //operation
 	);
 }
 
 void Analizer::set_rulle(LexType lexem)
 {
-	clip.set(lexem);
+	clip.set_array(2,
+		LexType::TYPE_OPERATION_DELTA,
+		lexem);
 }
-
 
 int main()
 {
-	Analizer anal;
-	anal.run("C:\\Users\\Nik\\source\\repos\\Analizer\\x64\\Debug\\test.txt");
-	switch (anal.error_code)
-	{
-	case(Errors::MISS_TERMINAL):
-		printf("ERROR 1: mismatch termanl on row:%d column:%d\n wait:%s\n get:%s\n",
-			anal.position().row,
-			anal.position().column,
-			get_lex_type_name(anal.last_waited_lexem()),
-			anal.last_readed_lexem());
-		break;
-	case(Errors::NO_RECOGNIZE_LEXEM):
-		printf("ERROR 2: Unricognize Lexem");
-		break;
-	case(Errors::NO_CORRECT_STRUCT):
-		printf("ERROR 3: incorrect construction on row:%d column:%d\n get:%s\n",
-			anal.position().row,
-			anal.position().column,
-			anal.last_readed_lexem());
-		break;
-	case(Errors::NAME_REZERV):
-		printf("ERROR 4: name alrady used row:%d column:%d\n name:%s\n",
-			anal.position().row,
-			anal.position().column,
-			anal.last_readed_lexem());
-		break;
-	case(Errors::NAME_NOT_EXIST):
-		printf("ERROR 5: name is not exist row:%d column:%d\n name:%s\n",
-			anal.position().row,
-			anal.position().column,
-			anal.last_readed_lexem());
-		break;	
-	case(Errors::NO_DATA_TYPE):
-		printf("ERROR 6: incorrect data type row:%d column:%d\n variable:%s\n",
-			anal.position().row,
-			anal.position().column,
-			anal.last_readed_lexem());
-		break;
-	case(Errors::NO_VARIABLE):
-		printf("ERROR 6: is not variable row:%d column:%d\n",
-			anal.position().row,
-			anal.position().column);
-			break;
-	case(Errors::NO_PARAM_MATCH):
-		printf("ERROR 6: param count is not mach row:%d column:%d\n",
-			anal.position().row,
-			anal.position().column);
-			break;
-	default:
-		anal.draw_semantic_tree();
+	Analizer* analize = new Analizer();
+	analize->run("C:\\Users\\Nik\\source\\repos\\Analizer\\x64\\Debug\\test.txt");
+	if (analize->error_code != Errors::NO_ERROR) {
+		error_messange(analize);
+	}
+	else {
+		analize->draw_semantic_tree();
+		analize->write_triads();
 	}
 }

@@ -19,6 +19,9 @@
     <Filter Include="Файлы заголовков\Semantic">
       <UniqueIdentifier>{66f27428-3b67-49a2-90c7-d3ff9e5dab78}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\Triads">
+      <UniqueIdentifier>{98497ce7-d3b4-41f3-ba36-02c2db721c1a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Analizer.cpp">
@@ -34,9 +37,15 @@
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Semantic.cpp">
-      <Filter>Исходные файлы</Filter>
+      <Filter>Исходные файлы\Semantic</Filter>
     </ClCompile>
     <ClCompile Include="Translate.cpp">
+      <Filter>Исходные файлы\Semantic</Filter>
+    </ClCompile>
+    <ClCompile Include="TriadGenerator.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Errors.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
@@ -61,6 +70,9 @@
     </ClInclude>
     <ClInclude Include="Errors.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="TriadGenerator.h">
+      <Filter>Файлы заголовков\Triads</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

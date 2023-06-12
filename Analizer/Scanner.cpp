@@ -55,7 +55,7 @@ LexType Scanner::word_lexem()
         cur_char++;
     }
     lex[i] = '\0';
-    for (int j = 0; j < 5; j++)
+    for (int j = 0; j < 7; j++)
         if (strcmp(lex, keyword[j]) == 0) {
             cur_position.column += i;
             last_lexem = lex;
@@ -74,6 +74,7 @@ LexType Scanner::number_lexem()
         lex[i++] = *cur_char;
         cur_char++;
     }
+    lex[i] = '\0';
     cur_position.column += i;
     last_lexem = lex;
     return LexType::CONSTANT;
@@ -174,7 +175,7 @@ LexType Scanner::scan()
             cur_position.column += 2;
             return LexType::MORE_OR_EQUAL_SIGN;
         }
-        last_lexem = (char*)"||";
+        last_lexem = (char*)">";
         cur_position.column += 1;
         return LexType::MORE_SIGN;
     }

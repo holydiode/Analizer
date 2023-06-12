@@ -5,6 +5,7 @@ SemanticNode::SemanticNode()
 {
 	name = nullptr;
 	count_param = 0;
+	func_start = 0;
 	is_init = false;
 	left = nullptr;
 	right = nullptr;
@@ -68,9 +69,27 @@ char* SemanticNode::full_name()
 	char* full_name = new char[100];
 	full_name[0] = '\0';
 	if (this->up)
-		strcpy_s(full_name, 100, this->up->full_name());
+		strcpy_s(full_name, 100, this->outside()->full_name());
 	if (name) {
-		if(this->up)
+		if (this->outside())
+			strcat_s(full_name, 100, ".");
+		strcat_s(full_name, 100, name);
+	}
+	return full_name;
+}
+
+char* SemanticNode::extended_name(bool is_top = true)
+{
+	char* full_name = new char[100];
+	full_name[0] = '\0';
+	if (this->up)
+		strcpy_s(full_name, 100, this->outside()->extended_name(false));
+	if (is_top) {
+		if (this->outside() && this->outside()->type == ObjectType::VAR)
+			strcat_s(full_name, 100, ".");
+		strcat_s(full_name, 100, name);
+	}else if (name && type == ObjectType::VAR) {
+		if (this->outside() && this->outside()->type == ObjectType::VAR)
 			strcat_s(full_name, 100, ".");
 		strcat_s(full_name, 100, name);
 	}
@@ -103,13 +122,18 @@ SemanticNode* SemanticNode::deep_object_copy()
 	SemanticNode* copy = new SemanticNode();
 	copy->count_param = count_param;
 	copy->type = type;
+	copy->func_start = func_start;
 	copy->source_objetc = source_objetc;
 	copy->is_init = is_init;
 	copy->name = name;
-	if (left)
+	if (left) {
 		copy->left = left->deep_object_copy();
-	if (right)
+		copy->left->up = copy;
+	}
+	if (right) {
 		copy->right = right->deep_object_copy();
+		copy->right->up = copy;
+	}
 	return copy;
 }
 
@@ -140,7 +164,8 @@ void SemanticNode::draw(int tab)
 		}
 	}
 	if (this->right)
-		this->right->draw(tab + 1);
+		if(this->type != ObjectType::FUN || ! this->outside() || this->outside()->type != ObjectType::VAR)
+			this->right->draw(tab + 1);
 	if (this->left)
 		this->left->draw(tab);
 }
@@ -193,6 +218,11 @@ void SemanticTree::draw()
 void SemanticTree::next()
 {
 	this->cursore = this->cursore->next();
+}
+
+SemanticNode* SemanticTree::current()
+{
+	return this->cursore;
 }
 
 SemanticNode* SemanticTree::find(char* name)

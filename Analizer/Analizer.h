@@ -14,6 +14,7 @@ public:
 	char* last_readed_lexem();
 	LexType last_waited_lexem();
 	void draw_semantic_tree();
+	void write_triads();
 private:
 	Clip clip;
 	Scanner scan;
@@ -30,7 +31,6 @@ private:
 	void in_class_decloration_rule2();
 
 	void decloaration_tail_rule1();
-	void decloaration_tail_rule2();
 	void decloaration_tail_rule3();
 
 	void comand_list_rule();
@@ -41,7 +41,6 @@ private:
 
 
 	void simple_operator_rule1();
-	void simple_operator_rule2();
 	void simple_operator_rule3();
 	void simple_operator_rule4();
 
@@ -49,6 +48,8 @@ private:
 	void for_rule();
 	void for_init_rule();
 	void for_expr_rule();
+
+	void for_step_rule();
 
 	void expr_rule();
 	void expr_right_rule();

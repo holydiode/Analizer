@@ -18,6 +18,7 @@ public:
 	char* name;
 	bool is_init;
 	int count_param;
+	int func_start;
 
 	SemanticNode();
 	void insert(SemanticNode* node);
@@ -27,6 +28,7 @@ public:
 	SemanticNode* next();
 	SemanticNode* find_upside(char* name);
 	char* full_name();
+	char* extended_name(bool is_top);
 	SemanticNode* find_inside(char* name);
 	SemanticNode* find_abowe(char* name);
 	SemanticNode* deep_object_copy();
@@ -47,6 +49,7 @@ public:
 	void region();
 	void draw();
 	void next();
+	SemanticNode* current();
 	SemanticNode* find(char* name);
 private:
 	SemanticNode* root;

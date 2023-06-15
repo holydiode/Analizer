@@ -57,6 +57,12 @@
     <ClCompile Include="Assempler.cpp">
       <Filter>Исходные файлы\Assembler</Filter>
     </ClCompile>
+    <ClCompile Include="ProcesMdel.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessorModule.cpp">
+      <Filter>Исходные файлы\Assembler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Clip.h">
@@ -84,6 +90,9 @@
       <Filter>Файлы заголовков\Triads</Filter>
     </ClInclude>
     <ClInclude Include="Assempler.h">
+      <Filter>Файлы заголовков\Assembler</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcesMdel.h">
       <Filter>Файлы заголовков\Assembler</Filter>
     </ClInclude>
   </ItemGroup>

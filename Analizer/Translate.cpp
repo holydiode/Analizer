@@ -19,13 +19,13 @@ Translate::Translate(Analizer* analize)
 	boolean_class->name = (char*)"boolean";
 	boolean_class->type = ObjectType::CLASS;
 	boolean_class->insert(new SemanticNode());
-	boolean_class->meta.size = 1;
+	boolean_class->meta.sizes->size = 1;
 
 
 	double_class->name = (char*)"double";
 	double_class->type = ObjectType::CLASS;
 	double_class->insert(new SemanticNode());
-	double_class->meta.size = 8;
+	double_class->meta.sizes->size = 8;
 }
 
 void Translate::set_class()
@@ -84,7 +84,6 @@ void Translate::complite_dec_var()
 	SemanticNode* node = factory.create();
 	node->type = ObjectType::VAR;
 	node->insert(node->source_objetc->inside()->deep_object_copy());
-	this->context_object = nullptr;
 	tree.add(node);
 	SemanticNode* base = node->outside();
 	while (base->type != ObjectType::FUN && base->type != ObjectType::CLASS)
@@ -97,6 +96,7 @@ void Translate::complite_dec_var()
 		node->meta.alloc_type = MemmoryAlocationType::Object;
 
 	base->meta.reserved_data.push_back(node);
+	this->context_object = node;
 }
 
 void Translate::complite_dec_fun()
@@ -157,7 +157,7 @@ void Translate::add_param()
 	node->source_objetc = this->context_object;
 	node->insert(node->source_objetc->inside()->deep_object_copy());
 	this->factory.add_param(node);
-	this->generator.send_init_param(this->analizer->last_readed_lexem());
+	this->generator.send_init_param(node);
 	context_object = nullptr;
 }
 
@@ -176,6 +176,7 @@ void Translate::check_is_variable()
 	operand->link = nullptr;
 	operand->source_object = this->context_object->source_objetc;
 	operand->lex = this->context_object->extended_name(true);
+	operand->init_node = this->context_object;
 	generator.push_operand(operand);
 }
 
@@ -237,6 +238,7 @@ void Translate::push_var() {
 	operand->link = nullptr;
 	operand->source_object = this->context_object->source_objetc;
 	operand->lex = this->context_object->name;
+	operand->init_node = this->context_object;
 	generator.push_operand(operand);
 }
 
@@ -269,15 +271,17 @@ void Translate::return_operation()
 void Translate::prepare_for_assign_operation()
 {
 	Operand* operand = new Operand();
-	operand->source_object = this->context_object;
+	operand->source_object = this->context_object->source_objetc;
+	operand->init_node = this->context_object;
 	operand->is_const = false;
-	operand->lex = this->analizer->last_readed_lexem();
+	operand->lex = this->context_object->name;
 	this->generator.push_operand(operand);
+	this->free_context();
 }
 
 Assemler* Translate::get_assembler()
 {
-	return new Assemler(&this->tree, &this->meta);
+	return new Assemler(&this->tree, &this->meta, &generator.triads);
 }
 
 void Translate::generate_assing()

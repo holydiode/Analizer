@@ -144,6 +144,8 @@
     <ClCompile Include="Clip.cpp" />
     <ClCompile Include="Errors.cpp" />
     <ClCompile Include="Lexems.cpp" />
+    <ClCompile Include="ProcesMdel.cpp" />
+    <ClCompile Include="ProcessorModule.cpp" />
     <ClCompile Include="Scanner.cpp" />
     <ClCompile Include="SemanticTree.cpp" />
     <ClCompile Include="Translate.cpp" />
@@ -155,6 +157,7 @@
     <ClInclude Include="Clip.h" />
     <ClInclude Include="Errors.h" />
     <ClInclude Include="Lexems.h" />
+    <ClInclude Include="ProcesMdel.h" />
     <ClInclude Include="Scanner.h" />
     <ClInclude Include="SemanticTree.h" />
     <ClInclude Include="Translate.h" />

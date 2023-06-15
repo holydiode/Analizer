@@ -136,6 +136,7 @@ SemanticNode* SemanticNode::deep_object_copy()
 	SemanticNode* copy = new SemanticNode();
 	copy->count_param = count_param;
 	copy->type = type;
+	copy->meta.sizes = meta.sizes;
 	copy->func_start = func_start;
 	copy->source_objetc = source_objetc;
 	copy->name = name;
@@ -195,7 +196,7 @@ void SemanticNode::draw_meta(int tab)
 			printf("VAR %s:(%s)\n", this->name, this->meta.addr);
 			break;
 		case(ObjectType::FUN):
-			printf("FUN %s, sizeof(%d)\n", this->assemble_name(), this->meta.size);
+			printf("FUN %s, sizeof(%d)\n", this->assemble_name(), this->meta.sizes->size);
 			break;
 		}
 	}

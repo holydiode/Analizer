@@ -451,9 +451,10 @@ void Analizer::in_class_decloration_rule2()
 
 void Analizer::decloaration_tail_rule1()
 {
-	clip.set_array(2,
+	clip.set_array(3,
 		LexType::SEMY,
-		LexType::VAR_DECLARE_DELTA //delta
+		LexType::VAR_DECLARE_DELTA,
+		LexType::FREE_CONTEXT_DELTA
 		);
 }
 
@@ -522,12 +523,12 @@ void Analizer::simple_operator_rule4()
 {
 	clip.set_array(7,
 		LexType::DATA_TYPE,
-		LexType::ASSIGN_INIT_OPERATION_DELTA,
 		LexType::NAME_DECLARE_DELTA,
 		LexType::NAME,
+		LexType::VAR_DECLARE_DELTA,
+		LexType::ASSIGN_INIT_OPERATION_DELTA,
 		LexType::VAR_DEC_TAIL,
-		LexType::SEMY,
-		LexType::VAR_DECLARE_DELTA
+		LexType::SEMY
 	);
 }
 
@@ -553,11 +554,12 @@ void Analizer::for_rule()
 
 void Analizer::for_init_rule()
 {
-	clip.set_array(7,
+	clip.set_array(8,
 		LexType::DATA_TYPE,
 		LexType::NAME_DECLARE_DELTA,  //delta         //boopa
 		LexType::NAME,
 		LexType::VAR_DECLARE_DELTA,   //delta
+		LexType::FREE_CONTEXT_DELTA,
 		LexType::ASSIGN_SIGN,
 		LexType::EXPR,
 		LexType::ASSIGN_OPERATION_DELTA
@@ -872,11 +874,11 @@ void Analizer::ident_operation_tail_rule2()
 void Analizer::ident_operation_tail_rule3()
 {
 	clip.set_array(5,
-		LexType::ASSIGN_INIT_OPERATION_DELTA,
-		LexType::NAME_DECLARE_DELTA,  //delta 
+		LexType::NAME_DECLARE_DELTA, 
 		LexType::NAME,
-		LexType::VAR_DEC_TAIL,
-		LexType::VAR_DECLARE_DELTA  //delta
+		LexType::VAR_DECLARE_DELTA,
+		LexType::ASSIGN_INIT_OPERATION_DELTA,
+		LexType::VAR_DEC_TAIL
 	);
 }
 
@@ -910,5 +912,8 @@ int main()
 		assembler->count_sizes();
 		assembler->count_addr();
 		assembler->draw_tree();
+		assembler->asemble();
+		assembler->print();
+		
 	}
 }

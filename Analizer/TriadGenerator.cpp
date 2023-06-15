@@ -117,11 +117,13 @@ void TriadGenerator::call(SemanticNode* function)
     operands.push(link);
 }
 
-void TriadGenerator::send_init_param(char* name)
+void TriadGenerator::send_init_param(SemanticNode* node)
 {
-    Operand* param_name = new Operand();
-    param_name->lex = name;
-    param_name->is_const = false;
+    Operand* param = new Operand();
+    param->lex = node->name;
+    param->source_object = node->source_objetc;
+    param->init_node = node;
+    param->is_const = false;
 
     Triad* operand = new Triad();
     operand->operation = (char*)"POP";
@@ -134,7 +136,7 @@ void TriadGenerator::send_init_param(char* name)
     operands.push(link);
 
     Triad* init_operand = new Triad();
-    init_operand->left_operand = param_name;
+    init_operand->left_operand = param;
     init_operand->right_operand = this->pop_operand();
     init_operand->operation = (char*)"=";
     init_operand->number = this->triads.size();

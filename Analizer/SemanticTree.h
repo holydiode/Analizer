@@ -19,11 +19,16 @@ enum class MemmoryAlocationType
 	Object,
 };
 
-struct NodeMetadata
+struct Sizes
 {
 	int size = 0;
 	int move = 0;
-	char* addr = (char*)"null";
+};
+
+struct NodeMetadata
+{
+	Sizes* sizes = new Sizes();
+	char* addr = nullptr;
 	MemmoryAlocationType alloc_type;
 	std::vector<SemanticNode*> reserved_data;
 };

@@ -25,6 +25,7 @@ struct Triad {
     void print();
     char* link_from_number(int number);
     MemoryCursore* mem = nullptr;
+    char* pointer = nullptr;
 };
 
 

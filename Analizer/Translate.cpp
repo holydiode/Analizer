@@ -104,7 +104,7 @@ void Translate::complite_dec_fun()
 	SemanticNode* node = factory.create();
 	node->type = ObjectType::FUN;
 	this->context_object = nullptr;
-	node->func_start = this->generator.get_number_last_comand() - node->count_param * 2;
+	node->func_start = this->generator.get_number_last_comand() - node->count_param;
 	tree.add(node);
 	tree.region();
 	for (int i = 0; i < node->count_param; i++) {

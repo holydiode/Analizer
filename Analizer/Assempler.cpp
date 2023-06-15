@@ -62,10 +62,10 @@ void Assemler::count_addr()
 				strcat_s(functions[i]->meta.reserved_data[j]->meta.addr, 50, "(%rpb)");
 				break;
 			case (MemmoryAlocationType::Object):
-				strcat_s(functions[i]->meta.reserved_data[j]->meta.addr, 50, "(%rsp)");
+				strcat_s(functions[i]->meta.reserved_data[j]->meta.addr, 50, "(%rdi)");
 				break;
 			case (MemmoryAlocationType::Local):
-				strcat_s(functions[i]->meta.reserved_data[j]->meta.addr, 50, "(%rdi)");
+				strcat_s(functions[i]->meta.reserved_data[j]->meta.addr, 50, "(%rsp)");
 				break;
 			default:
 				break;
@@ -95,6 +95,12 @@ std::vector<AssemblerComand*>* Assemler::recount_function(std::vector<Triad*> tr
 	
 	for (int i = 0; i < triads.size(); i++) {
 		auto cur = triads[i];
+		if (cur->pointer) {
+			comands->push_back(new AssemblerComand("", "", ""));
+			comands->back()->pointer = cur->pointer;
+		}
+
+
 		switch (*cur->operation)
 		{
 		case('+'): {
@@ -169,9 +175,15 @@ std::vector<AssemblerComand*>* Assemler::recount_function(std::vector<Triad*> tr
 			model.EDX->is_reserved = true;
 			cur->mem = model.EDX;
 		}break;
+			
 
 		default:
-			break;
+			auto operator_result = operator_reesult(cur, function);
+			if (operator_result->size() > 0) {
+				function->meta.sizes->size += model.EAX->size;
+				comands->reserve(comands->size() + operator_result->size());
+				comands->insert(comands->end(), operator_result->begin(), operator_result->end());
+			}
 		}
 	}
 	return comands;
@@ -182,6 +194,15 @@ void Assemler::asemble()
 	auto functions = this->meta->functions;
 	for (int i = 0; i < functions.size(); i++) {
 		auto fun = this->recount_function(this->slicing_function(functions[i]->func_start), functions[i]);
+
+		this->comand->push_back(new AssemblerComand("", "", ""));
+		this->comand->back()->pointer = functions[i]->assemble_name();
+		this->comand->push_back(new AssemblerComand("PUSHF", "\0", "\0"));
+		this->comand->push_back(new AssemblerComand("MOV", "RBP", "RSP"));
+		auto size = new char[10];
+		sprintf_s(size, 10, "%d", functions[i]->meta.sizes->size);
+		this->comand->push_back(new AssemblerComand("SUB", "RSP", size));
+
 		this->comand->reserve(this->comand->size() + fun->size());
 		this->comand->insert(this->comand->end(), fun->begin(), fun->end());
 	}
@@ -199,6 +220,40 @@ std::vector<AssemblerComand*>* Assemler::save_reg(MemoryCursore* cursore, int mo
 	return comands;
 }
 
+std::vector<AssemblerComand*>* Assemler::operator_reesult(Triad* triad, SemanticNode* function)
+{
+	auto comands = new std::vector<AssemblerComand*>();
+	
+	if (strcmp("JIF", triad->operation) == 0) {
+		this->loop_number++;
+		comands->push_back(new AssemblerComand("", "", ""));
+		comands->back()->pointer = new char[50]{ '\0' };
+		sprintf_s(comands->back()->pointer, 50, "loop_%d_start", this->loop_number);
+		comands->push_back(new AssemblerComand("MOV", "EAX", "0"));
+		triad->left_operand->link->pointer = new char[50]{'\0'};
+		sprintf_s(triad->left_operand->link->pointer, 50, "loop_%d_end", this->loop_number);
+		comands->push_back(new AssemblerComand("JLE", triad->left_operand->link->pointer));
+	}
+	else if (strcmp("JMP", triad->operation) == 0) {
+		char* name = new char[50]{ '\0' };
+		sprintf_s(name, 50, "loop_%d_start", this->loop_number);
+		comands->push_back(new AssemblerComand("JMP", name));
+		this->loop_number--;
+	}else if (strcmp("CALL", triad->operation) == 0) {
+		comands->push_back(new AssemblerComand("CALL", triad->left_operand->init_node->assemble_name()));
+		triad->mem = this->model.EAX;
+		this->model.EAX->is_reserved = true;
+	}
+	else if (strcmp("RET", triad->operation) == 0) {
+		auto size = new char[10];
+		sprintf_s(size, 10, "%d", function->meta.sizes->size);
+		comands->push_back(new AssemblerComand("ADD", "RSP", size));
+		comands->push_back(new AssemblerComand("POPF", "\0"));
+		comands->push_back(new AssemblerComand("RET", "\0"));
+	}
+	return comands;
+}
+
 std::vector<Triad*> Assemler::slicing_function(int X)
 {
 	auto start = this->triads->begin() + X;
@@ -210,7 +265,6 @@ std::vector<Triad*> Assemler::slicing_function(int X)
 			break;
 		}
 	}
-
 	std::vector<Triad*> result(i - X + 1);
 	copy(start, end + 1, result.begin());
 	return result;
@@ -254,10 +308,10 @@ MemoryCursore* Assemler::operand_to_operand(Operand* operand)
 				strcat_s(operand->init_node->meta.addr, 50, "(%rpb)");
 				break;
 			case (MemmoryAlocationType::Object):
-				strcat_s(operand->init_node->meta.addr, 50, "(%rsp)");
+				strcat_s(operand->init_node->meta.addr, 50, "(%rdi)");
 				break;
 			case (MemmoryAlocationType::Local):
-				strcat_s(operand->init_node->meta.addr, 50, "(%rdi)");
+				strcat_s(operand->init_node->meta.addr, 50, "(%rsp)");
 				break;
 			default:
 				break;
@@ -276,5 +330,10 @@ AssemblerComand::AssemblerComand()
 
 void AssemblerComand::print()
 {
-	printf("    %s %s %s\n", this->oper, this->left, this->right);
+	if (this->pointer) {
+		printf("%s:\n", this->pointer);
+	}
+	if(*this->oper != '\0') {
+		printf("        %s %s %s\n", this->oper, this->left, this->right);
+	}
 }

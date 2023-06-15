@@ -21,6 +21,7 @@ struct AssemblerComand
 	const char* oper =  "\0";
 	const char* left =  "\0";
 	const char* right = "\0";
+	char* pointer = nullptr;
 
 	AssemblerComand();
 	AssemblerComand(const char* oper, const char* left, const char* right) {
@@ -49,6 +50,7 @@ public:
 	void asemble();
 private:
 	std::vector<AssemblerComand*>* save_reg(MemoryCursore* cursore, int move);
+	std::vector<AssemblerComand*>* operator_reesult(Triad* triad, SemanticNode* function);
 	std::vector<Triad*> slicing_function(int X);
 	MemoryCursore* operand_to_operand(Operand* operand);
 	SemanticTree* tree;
@@ -56,4 +58,5 @@ private:
 	std::vector<Triad*>* triads;
 	std::vector<AssemblerComand*>* comand;
 	ProcessorModule model;
+	int loop_number = 0;
 };

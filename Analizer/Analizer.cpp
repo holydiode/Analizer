@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include "Analizer.h"
+#include "Assempler.h"
 
 Analizer::Analizer()
 {
@@ -54,6 +55,11 @@ void Analizer::draw_semantic_tree()
 void Analizer::write_triads()
 {
 	this->transaltor.write_triads();
+}
+
+Assemler* Analizer::get_assembler()
+{
+	return transaltor.get_assembler();
 }
 
 int Analizer::terminal_process(LexType clip_lex)
@@ -451,8 +457,6 @@ void Analizer::decloaration_tail_rule1()
 		);
 }
 
-
-
 void Analizer::decloaration_tail_rule3()
 {
 	clip.set_array(12,
@@ -516,7 +520,7 @@ void Analizer::simple_operator_rule3()
 
 void Analizer::simple_operator_rule4()
 {
-	clip.set_array(6,
+	clip.set_array(7,
 		LexType::DATA_TYPE,
 		LexType::ASSIGN_INIT_OPERATION_DELTA,
 		LexType::NAME_DECLARE_DELTA,
@@ -902,5 +906,9 @@ int main()
 	else {
 		analize->draw_semantic_tree();
 		analize->write_triads();
+		Assemler* assembler = analize->get_assembler();
+		assembler->count_sizes();
+		assembler->count_addr();
+		assembler->draw_tree();
 	}
 }

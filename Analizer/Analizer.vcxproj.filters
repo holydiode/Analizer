@@ -22,6 +22,12 @@
     <Filter Include="Файлы заголовков\Triads">
       <UniqueIdentifier>{98497ce7-d3b4-41f3-ba36-02c2db721c1a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\Assembler">
+      <UniqueIdentifier>{7dedecfa-78bd-4293-9168-2181ec5aa143}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\Assembler">
+      <UniqueIdentifier>{ed2789a0-fd04-4882-ba59-ba11abc651d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Analizer.cpp">
@@ -36,7 +42,7 @@
     <ClCompile Include="Lexems.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Semantic.cpp">
+    <ClCompile Include="SemanticTree.cpp">
       <Filter>Исходные файлы\Semantic</Filter>
     </ClCompile>
     <ClCompile Include="Translate.cpp">
@@ -47,6 +53,9 @@
     </ClCompile>
     <ClCompile Include="Errors.cpp">
       <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Assempler.cpp">
+      <Filter>Исходные файлы\Assembler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -62,7 +71,7 @@
     <ClInclude Include="Scanner.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Semantic.h">
+    <ClInclude Include="SemanticTree.h">
       <Filter>Файлы заголовков\Semantic</Filter>
     </ClInclude>
     <ClInclude Include="Translate.h">
@@ -73,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="TriadGenerator.h">
       <Filter>Файлы заголовков\Triads</Filter>
+    </ClInclude>
+    <ClInclude Include="Assempler.h">
+      <Filter>Файлы заголовков\Assembler</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

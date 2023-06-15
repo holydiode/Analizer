@@ -140,21 +140,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Analizer.cpp" />
+    <ClCompile Include="Assempler.cpp" />
     <ClCompile Include="Clip.cpp" />
     <ClCompile Include="Errors.cpp" />
     <ClCompile Include="Lexems.cpp" />
     <ClCompile Include="Scanner.cpp" />
-    <ClCompile Include="Semantic.cpp" />
+    <ClCompile Include="SemanticTree.cpp" />
     <ClCompile Include="Translate.cpp" />
     <ClCompile Include="TriadGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Analizer.h" />
+    <ClInclude Include="Assempler.h" />
     <ClInclude Include="Clip.h" />
     <ClInclude Include="Errors.h" />
     <ClInclude Include="Lexems.h" />
     <ClInclude Include="Scanner.h" />
-    <ClInclude Include="Semantic.h" />
+    <ClInclude Include="SemanticTree.h" />
     <ClInclude Include="Translate.h" />
     <ClInclude Include="TriadGenerator.h" />
   </ItemGroup>

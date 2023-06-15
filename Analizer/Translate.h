@@ -1,9 +1,18 @@
 #pragma once
-#include "Semantic.h"
+#include "SemanticTree.h"
 #include "TriadGenerator.h"
+#include "Assempler.h"
 #include <stack>
+#include <vector>
 
 class Analizer;
+
+struct MetaDAta
+{
+	std::vector<SemanticNode*> functions;
+	std::vector<SemanticNode*> classes;
+};
+
 
 class Translate
 {
@@ -35,12 +44,14 @@ public:
 	void loop();
 	void return_operation();
 	void prepare_for_assign_operation();
+	Assemler* get_assembler();
 private:
 	bool name_is_exeist();
 	SemanticTree tree;
 	Analizer* analizer;
 	NodeFactory factory;
 	TriadGenerator generator;
+	MetaDAta meta;
 	SemanticNode* context_object;
 	std::stack<int> stak_call_param_count;
 	std::stack<int> marks;

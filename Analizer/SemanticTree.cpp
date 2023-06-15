@@ -1,4 +1,4 @@
-#include "Semantic.h"
+#include "SemanticTree.h"
 #include <iostream>
 
 SemanticNode::SemanticNode()
@@ -77,6 +77,21 @@ char* SemanticNode::full_name()
 	return full_name;
 }
 
+
+char* SemanticNode::assemble_name()
+{
+	char* full_name = new char[100];
+	full_name[0] = '\0';
+	if (this->up)
+		strcpy_s(full_name, 100, this->outside()->full_name());
+	if (name) {
+		if (this->outside())
+			strcat_s(full_name, 100, "_");
+		strcat_s(full_name, 100, name);
+	}
+	return full_name;
+}
+
 char* SemanticNode::extended_name(bool is_top = true)
 {
 	char* full_name = new char[100];
@@ -135,6 +150,7 @@ SemanticNode* SemanticNode::deep_object_copy()
 	return copy;
 }
 
+
 void SemanticNode::draw(int tab)
 {
 	if (this->name) {
@@ -168,11 +184,32 @@ void SemanticNode::draw(int tab)
 		this->left->draw(tab);
 }
 
+void SemanticNode::draw_meta(int tab)
+{
+	if (this->name) {
+		for (int i = 0; i < tab; i++)
+			printf("  ");
+		switch (this->type)
+		{
+		case(ObjectType::VAR):
+			printf("VAR %s:(%s)\n", this->name, this->meta.addr);
+			break;
+		case(ObjectType::FUN):
+			printf("FUN %s, sizeof(%d)\n", this->assemble_name(), this->meta.size);
+			break;
+		}
+	}
+	if (this->right)
+		if (this->type != ObjectType::VAR)
+			this->right->draw_meta(tab + 1);
+	if (this->left)
+		this->left->draw_meta(tab);
+}
+
 char* SemanticNode::datatype()
 {
 	return this->source_objetc->full_name();
 }
-
 
 void SemanticTree::up()
 {
@@ -194,14 +231,13 @@ void SemanticTree::add(SemanticNode* node)
 	}
 }
 
-void SemanticTree::region()
+void SemanticTree::region() //проверить работу на вложенные параметры
 {
 	if (this->cursore->inside()) {
 		this->cursore = this->cursore->inside();
 	}
 	else {
 		SemanticNode* region = new SemanticNode();
-		region->type = ObjectType::REGION;
 		this->cursore->insert(region);
 		this->cursore = region;
 	}
@@ -211,6 +247,12 @@ void SemanticTree::draw()
 {
 	if(root)
 		root->draw(0);
+}
+
+void SemanticTree::draw_meta()
+{
+	if (root)
+		root->draw_meta(0);
 }
 
 void SemanticTree::next()
@@ -264,6 +306,7 @@ void NodeFactory::add_param(SemanticNode* node)
 		this->node->insert(new SemanticNode());
 	this->node->count_param++;
 	this->node->insert(node);
+	this->node->meta.reserved_data.push_back(node);
 }
 
 void NodeFactory::set_class_object(SemanticNode* node)

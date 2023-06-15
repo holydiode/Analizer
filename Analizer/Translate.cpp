@@ -15,13 +15,17 @@ Translate::Translate(Analizer* analize)
 	generator = TriadGenerator();
 	this->analizer = analize;
 	this->context_object = nullptr;
+
 	boolean_class->name = (char*)"boolean";
 	boolean_class->type = ObjectType::CLASS;
 	boolean_class->insert(new SemanticNode());
+	boolean_class->meta.size = 1;
+
 
 	double_class->name = (char*)"double";
 	double_class->type = ObjectType::CLASS;
 	double_class->insert(new SemanticNode());
+	double_class->meta.size = 8;
 }
 
 void Translate::set_class()
@@ -34,7 +38,7 @@ void Translate::set_class()
 	}
 	tree.add(node);
 	tree.region();
-
+	this->meta.classes.push_back(node);
 }
 
 void Translate::process_data_type()
@@ -82,6 +86,17 @@ void Translate::complite_dec_var()
 	node->insert(node->source_objetc->inside()->deep_object_copy());
 	this->context_object = nullptr;
 	tree.add(node);
+	SemanticNode* base = node->outside();
+	while (base->type != ObjectType::FUN && base->type != ObjectType::CLASS)
+	{
+		base = base->outside();
+	}
+	if (base->type == ObjectType::FUN)
+		node->meta.alloc_type = MemmoryAlocationType::Local;
+	if(base->type == ObjectType::CLASS)
+		node->meta.alloc_type = MemmoryAlocationType::Object;
+
+	base->meta.reserved_data.push_back(node);
 }
 
 void Translate::complite_dec_fun()
@@ -95,6 +110,7 @@ void Translate::complite_dec_fun()
 	for (int i = 0; i < node->count_param; i++) {
 		this->tree.next();
 	}
+	this->meta.functions.push_back(node);
 }
 
 void Translate::draw_semantic_tree()
@@ -158,7 +174,7 @@ void Translate::check_is_variable()
 	Operand* operand = new Operand();
 	operand->is_const = false;
 	operand->link = nullptr;
-	operand->data_type = this->context_object->datatype();
+	operand->source_object = this->context_object->source_objetc;
 	operand->lex = this->context_object->extended_name(true);
 	generator.push_operand(operand);
 }
@@ -169,7 +185,7 @@ void Translate::init_call()
 		this->analizer->error_code = Errors::NO_FUN;
 	}
 	this->stak_call_param_count.push(this->context_object->count_param);
-	this->generator.call(this->context_object->extended_name(true), this->context_object->func_start, this->context_object->datatype());
+	this->generator.call(this->context_object);
 }
 
 void Translate::add_call_param()
@@ -184,7 +200,7 @@ void Translate::add_call_param()
 	for (int i = 0; i < function->count_param - count - 1; i++) {
 		data_holder = data_holder->next();
 	}
-	if (this->generator.send_param(data_holder->datatype())) {
+	if (this->generator.send_param(data_holder->source_objetc)) {
 		analizer->error_code = Errors::NO_DATA_TYPE_MATCH;
 	}
 	this->context_object = function;
@@ -207,10 +223,10 @@ void Translate::push_const()
 	operand->link = nullptr;
 	operand->lex = this->analizer->last_readed_lexem();
 	if (*operand->lex == 't' || *operand->lex == 'f') {
-		operand->data_type = (char*)"boolean";
+		operand->source_object = boolean_class;
 	}
 	else {
-		operand->data_type = (char*)"double";
+		operand->source_object = double_class;
 	}
 	generator.push_operand(operand);
 }
@@ -219,7 +235,7 @@ void Translate::push_var() {
 	Operand* operand = new Operand();
 	operand->is_const = false;
 	operand->link = nullptr;
-	operand->data_type = this->context_object->datatype();
+	operand->source_object = this->context_object->source_objetc;
 	operand->lex = this->context_object->name;
 	generator.push_operand(operand);
 }
@@ -245,7 +261,7 @@ void Translate::loop()
 
 void Translate::return_operation()
 {
-	if (this->generator.ret_gen(this->tree.current()->outside()->datatype())) {
+	if (this->generator.ret_gen(this->tree.current()->outside()->source_objetc)) {
 		analizer->error_code = Errors::NO_DATA_TYPE_MATCH;
 	};
 }
@@ -253,10 +269,15 @@ void Translate::return_operation()
 void Translate::prepare_for_assign_operation()
 {
 	Operand* operand = new Operand();
-	operand->data_type = this->context_object->full_name();
+	operand->source_object = this->context_object;
 	operand->is_const = false;
 	operand->lex = this->analizer->last_readed_lexem();
 	this->generator.push_operand(operand);
+}
+
+Assemler* Translate::get_assembler()
+{
+	return new Assemler(&this->tree, &this->meta);
 }
 
 void Translate::generate_assing()

@@ -15,6 +15,7 @@ public:
 	LexType last_waited_lexem();
 	void draw_semantic_tree();
 	void write_triads();
+	Assemler* get_assembler();
 private:
 	Clip clip;
 	Scanner scan;

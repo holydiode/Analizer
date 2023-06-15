@@ -5,7 +5,7 @@ int TriadGenerator::generate(char*  type)
     Triad* triad = new Triad();
     triad->right_operand = this->pop_operand();
     triad->left_operand = this->pop_operand();
-    if (strcmp(triad->left_operand->data_type, triad->right_operand->data_type) != 0) {
+    if (triad->left_operand->source_object != triad->right_operand->source_object) {
         return 1;
     }
 
@@ -16,7 +16,7 @@ int TriadGenerator::generate(char*  type)
     Operand* link = new Operand;
     link->is_const = false;
     link->link = triad;
-    link->data_type = triad->left_operand->data_type;
+    link->source_object = triad->left_operand->source_object;
     operands.push(link);
     return 0;
 }
@@ -93,16 +93,15 @@ void TriadGenerator::loop(int start, int end)
     this->push_triad(start_loop, start + 1, true);
 }
 
-void TriadGenerator::call(char* function, int pos, char* datatype)
+void TriadGenerator::call(SemanticNode* function)
 {
     Operand* name = new Operand();
-    name->lex = function;
+    name->lex = function->extended_name(true);
     name->is_const = false;
 
     Operand* start_pos = new Operand();
-    start_pos->link = this->triads[pos];
+    start_pos->link = this->triads[function->func_start];
     start_pos->is_const = false;
-
 
     Triad* ret_loop = new Triad();
     ret_loop->left_operand = name;
@@ -114,7 +113,7 @@ void TriadGenerator::call(char* function, int pos, char* datatype)
     Operand* link = new Operand;
     link->is_const = false;
     link->link = ret_loop;
-    link->data_type = datatype;
+    link->source_object = function->source_objetc;
     operands.push(link);
 }
 
@@ -142,11 +141,11 @@ void TriadGenerator::send_init_param(char* name)
     this->push_triad(init_operand);
 }
 
-int TriadGenerator::ret_gen(char* data_type)
+int TriadGenerator::ret_gen(SemanticNode* data_type)
 {
     Triad* ret_loop = new Triad();
     ret_loop->left_operand = this->pop_operand();
-    if (strcmp(ret_loop->left_operand->data_type, data_type) != 0) {
+    if (ret_loop->left_operand->source_object != data_type) {
         return 1;
     }
     ret_loop->operation = (char*)"RET";
@@ -155,11 +154,11 @@ int TriadGenerator::ret_gen(char* data_type)
     return 0;
 }
 
-int TriadGenerator::send_param(char* data_type)
+int TriadGenerator::send_param(SemanticNode* data_type)
 {
     Triad* operand = new Triad();
     operand->left_operand = this->pop_operand();
-    if (strcmp(operand->left_operand->data_type, data_type) != 0) {
+    if (operand->left_operand->source_object != data_type) {
         return 1;
     }
     operand->operation = (char*)"PUSH";

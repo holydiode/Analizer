@@ -284,6 +284,11 @@ Assemler* Translate::get_assembler()
 	return new Assemler(&this->tree, &this->meta, &generator.triads);
 }
 
+Optimizator* Translate::get_optimazer()
+{
+	return new Optimizator(&this->generator.triads);
+}
+
 void Translate::generate_assing()
 {
 	this->generator.generate((char*)"=");

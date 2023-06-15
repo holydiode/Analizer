@@ -28,6 +28,9 @@
     <Filter Include="Исходные файлы\Assembler">
       <UniqueIdentifier>{ed2789a0-fd04-4882-ba59-ba11abc651d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Исходные файлы\Optimization">
+      <UniqueIdentifier>{6ec72d91-7b1d-4db6-a73d-ad388f5fbe95}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Analizer.cpp">
@@ -63,6 +66,9 @@
     <ClCompile Include="ProcessorModule.cpp">
       <Filter>Исходные файлы\Assembler</Filter>
     </ClCompile>
+    <ClCompile Include="Optimizator.cpp">
+      <Filter>Исходные файлы\Optimization</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Clip.h">
@@ -94,6 +100,9 @@
     </ClInclude>
     <ClInclude Include="ProcesMdel.h">
       <Filter>Файлы заголовков\Assembler</Filter>
+    </ClInclude>
+    <ClInclude Include="Optimizator.h">
+      <Filter>Исходные файлы\Optimization</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

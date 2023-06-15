@@ -16,6 +16,7 @@ public:
 	void draw_semantic_tree();
 	void write_triads();
 	Assemler* get_assembler();
+	Optimizator* get_optimizer();
 private:
 	Clip clip;
 	Scanner scan;

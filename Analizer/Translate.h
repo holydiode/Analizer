@@ -2,6 +2,7 @@
 #include "SemanticTree.h"
 #include "TriadGenerator.h"
 #include "Assempler.h"
+#include "Optimizator.h"
 #include <stack>
 #include <vector>
 
@@ -45,6 +46,7 @@ public:
 	void return_operation();
 	void prepare_for_assign_operation();
 	Assemler* get_assembler();
+	Optimizator* get_optimazer();
 private:
 	bool name_is_exeist();
 	SemanticTree tree;

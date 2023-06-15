@@ -62,6 +62,11 @@ Assemler* Analizer::get_assembler()
 	return transaltor.get_assembler();
 }
 
+Optimizator* Analizer::get_optimizer()
+{
+	return this->transaltor.get_optimazer();
+}
+
 int Analizer::terminal_process(LexType clip_lex)
 {
 	LexType scan_lex = scan.scan();
@@ -907,6 +912,10 @@ int main()
 	}
 	else {
 		analize->draw_semantic_tree();
+		analize->write_triads();
+		Optimizator* opti = analize->get_optimizer();
+		printf("===============\n");
+		opti->count_const();
 		analize->write_triads();
 		Assemler* assembler = analize->get_assembler();
 		assembler->count_sizes();

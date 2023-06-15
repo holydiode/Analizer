@@ -144,6 +144,7 @@
     <ClCompile Include="Clip.cpp" />
     <ClCompile Include="Errors.cpp" />
     <ClCompile Include="Lexems.cpp" />
+    <ClCompile Include="Optimizator.cpp" />
     <ClCompile Include="ProcesMdel.cpp" />
     <ClCompile Include="ProcessorModule.cpp" />
     <ClCompile Include="Scanner.cpp" />
@@ -157,6 +158,7 @@
     <ClInclude Include="Clip.h" />
     <ClInclude Include="Errors.h" />
     <ClInclude Include="Lexems.h" />
+    <ClInclude Include="Optimizator.h" />
     <ClInclude Include="ProcesMdel.h" />
     <ClInclude Include="Scanner.h" />
     <ClInclude Include="SemanticTree.h" />
